@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "478401962023",
+    "project_id": "messagerieinstantanee-7aa3d",
+    "storage_bucket": "messagerieinstantanee-7aa3d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:478401962023:android:86f8ecd3ed5aa3d50fae02",
+        "android_client_info": {
+          "package_name": "com.example.messagerie_instantanee"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAK8cU1WBuAxb1MEBBs096Bg8ix-LmdOlY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
