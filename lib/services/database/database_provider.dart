@@ -30,7 +30,6 @@ class DatabaseProvider extends ChangeNotifier {
   final _db = DatabaseService();
 
 
-
   // on recupere le profil utilisateur grace a luid
   Future<UserProfile?> userProfile(String uid) => _db.getUserFromFirebase(uid);
 
@@ -45,6 +44,7 @@ class DatabaseProvider extends ChangeNotifier {
 
   // get all the local conversations and Messages
   List<Conversation> get allConversations => _allConversations;
+
   List<Message> get allMessages => _allMessages;
 
   // Get all the conversation of the user
@@ -57,14 +57,15 @@ class DatabaseProvider extends ChangeNotifier {
   }
 
   // Send a message
-  Future<void> sendMessage (String receiverId, String content) async {
+  Future<void> sendMessage(String receiverId, String content) async {
     // Sending the message only in firebase
     await _db.sendMessageInFirebase(receiverId, content);
 
     // Reload conversations and messages
     await loadAllUserConversations();
 
-    String conversationId = _generateConversationId(_auth.getCurrentUid(), receiverId);
+    String conversationId = _generateConversationId(
+        _auth.getCurrentUid(), receiverId);
     await loadMessageinConversation(conversationId);
   }
 
@@ -82,12 +83,28 @@ class DatabaseProvider extends ChangeNotifier {
 
   // Load messages conversation
   Future<void> loadMessageinConversation(String conversationId) async {
-      _allMessages = await _db.getAllMessageInConversationFromFirebase(conversationId);
-      notifyListeners();
+    _allMessages =
+    await _db.getAllMessageInConversationFromFirebase(conversationId);
+    notifyListeners();
+    await loadMessageinConversation(conversationId);
   }
 
   String _generateConversationId(String uid1, String uid2) {
     List<String> participants = [uid1, uid2]..sort();
     return participants.join("_");
+  }
+
+  //Likess
+  Future<void> toggleLikeMessage(String messageId) async {
+    try {
+      // Toggle like in Firebase
+      await _db.toggleLikeMessageInFirebase(messageId);
+
+      // Reload messages to update the UI
+      String? conversationId = _allMessages.firstWhere((message) => message.id == messageId).conversationId;
+      await loadMessageinConversation(conversationId);
+    } catch (e) {
+      print(e);
+    }
   }
 }

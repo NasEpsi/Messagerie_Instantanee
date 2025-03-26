@@ -88,7 +88,7 @@ class _ChatPageState extends State<ChatPage> {
 
                 if (messages.isEmpty) {
                   return const Center(
-                    child: Text('No messages yet'),
+                    child: Text('Aucun message pour le moment'),
                   );
                 }
 
@@ -132,7 +132,7 @@ class _ChatPageState extends State<ChatPage> {
                   child: TextField(
                     controller: _messageController,
                     decoration: const InputDecoration(
-                      hintText: 'Type a message',
+                      hintText: 'Ecrivez un message',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(25.0)),
                       ),

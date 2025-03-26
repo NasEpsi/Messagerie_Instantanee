@@ -203,4 +203,23 @@ class DatabaseService {
       return [];
     }
   }
+
+  //LIKESSS
+
+  Future<void> toggleLikeMessageInFirebase(String messageId) async {
+    try {
+      // Get the current message
+      DocumentSnapshot messageDoc = await _db.collection('Messages').doc(messageId).get();
+
+      // Get the current like status
+      bool isCurrentlyLiked = messageDoc['isLiked'] ?? false;
+
+      // Toggle the like status
+      await _db.collection('Messages').doc(messageId).update({
+        'isLiked': !isCurrentlyLiked,
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
 }

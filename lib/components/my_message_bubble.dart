@@ -4,16 +4,15 @@ import '../helper/time_formatter.dart';
 import '../models/message.dart';
 import '../services/database/database_provider.dart';
 
-
 class MessageBubble extends StatelessWidget {
   final Message message;
   final bool isMyMessage;
 
   const MessageBubble({
-    Key? key,
+    super.key,
     required this.message,
     required this.isMyMessage,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -58,14 +57,15 @@ class MessageBubble extends StatelessWidget {
                   const SizedBox(width: 4),
                   GestureDetector(
                     onTap: () {
-                      // TODO: Implement like functionality
+                      provider.toggleLikeMessage(message.id);
                     },
-                    child: const Icon(
-                      Icons.favorite_border,
+                    child: Icon(
+                      message.isLiked ? Icons.favorite : Icons.favorite_border,
                       size: 16,
-                      color: Colors.grey,
+                      color: message.isLiked ? Colors.red : Colors.grey,
                     ),
                   ),
+                  // Maybe later
                   // if (isMyMessage)
                   //   GestureDetector(
                   //     onTap: () {
