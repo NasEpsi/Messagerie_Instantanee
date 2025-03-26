@@ -22,9 +22,11 @@ class AuthService {
   // get the auth  instance
   final _auth = FirebaseAuth.instance;
 
-
   // get the current user and his id
   User? getCurrentUser() => _auth.currentUser;
+  // String? getCurrentUserId() {
+  //   return _auth.currentUser?.uid;
+  // }
 
   String getCurrentUid() => _auth.currentUser!.uid;
 

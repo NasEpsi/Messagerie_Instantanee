@@ -36,6 +36,7 @@ class UserProfile{
       name: doc['name'],
       email: doc['email'],
       username: doc['username'],
+
     );
   }
   // Converting a model user into a firestore file

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:messagerie_instantanee/pages/conversations_list_page.dart';
+import 'package:messagerie_instantanee/pages/home_page.dart';
+import 'package:messagerie_instantanee/pages/user_list_page.dart';
 
 import '../services/auth/auth_service.dart';
 import 'my_drawer_tile.dart';
@@ -62,6 +65,12 @@ class MyDrawer extends StatelessWidget {
                 icon: Icons.home,
                 onTap: () {
                   Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ConversationListPage(),
+                    ),
+                  );
                 },
               ),
 
@@ -82,20 +91,20 @@ class MyDrawer extends StatelessWidget {
               //   },
               // ),
 
-              // // Rechercher
-              // MyDrawerTile(
-              //   title: "Rechercher",
-              //   icon: Icons.search,
-              //   onTap: () {
-              //     Navigator.pop(context);
-              //     Navigator.push(
-              //       context,
-              //       MaterialPageRoute(
-              //         builder: ,
-              //       ),
-              //     );
-              //   },
-              // ),
+              // Rechercher
+              MyDrawerTile(
+                title: "Rechercher",
+                icon: Icons.search,
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => UsersListPage(),
+                    ),
+                  );
+                },
+              ),
 
               // Parametres
               // MyDrawerTile(
