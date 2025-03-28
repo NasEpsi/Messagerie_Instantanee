@@ -13,7 +13,7 @@ void goUserPage(BuildContext context, String uid) {
   );
 }
 class NavigationPages extends StatefulWidget {
-  const NavigationPages({Key? key}) : super(key: key);
+  const NavigationPages({super.key});
 
   @override
   State<NavigationPages> createState() => _NavigationPagesState();
@@ -43,11 +43,11 @@ class _NavigationPagesState extends State<NavigationPages> {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.chat),
-            label: 'Chats',
+            label: 'Conversations',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.people),
-            label: 'Users',
+            label: 'Utilisateur',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),

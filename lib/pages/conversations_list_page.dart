@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../components/my_drawer.dart';
 import '../helper/time_formatter.dart';
 import '../models/conversation.dart';
 import '../services/database/database_provider.dart';
@@ -40,6 +41,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: MyDrawer(),
       appBar: AppBar(
         title: Text(
           'Vos conversations',
@@ -52,6 +54,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
             onPressed: _navigateToCurrentUserProfile,
           ),
         ],
+
       ),
       backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       body: Consumer<DatabaseProvider>(

@@ -49,10 +49,9 @@ class _ProfilePageState extends State<ProfilePage> {
       setState(() {
         _isLoading = true;
         _isFriendRequestSent = false;
-
       });
 
-      // reset friend requedt  status
+      // reset friend request status
       if (_isFriend || _hasIncomingFriendRequest) {
         _isFriendRequestSent = false;
       }
@@ -151,13 +150,17 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-
   // Settings Dialog
   void _showSettingsDialog() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Paramètres du Profil'),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text('Paramètres du Profil',
+        style: TextStyle(
+            color: Theme.of(context).colorScheme.primary,
+        ),),
+
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -166,7 +169,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 Navigator.of(context).pop();
                 _showEditBioDialog();
               },
-              child: const Text('Modifier la bio'),
+              child: Text('Modifier la bio'),
+
             ),
           ],
         ),
@@ -243,14 +247,14 @@ class _ProfilePageState extends State<ProfilePage> {
           Text(
             'Ami',
             style: TextStyle(
-              color: Colors.green,
+              color: Theme.of(context).colorScheme.primary,
               fontWeight: FontWeight.bold,
             ),
           ),
           ElevatedButton(
             onPressed: _removeFriend,
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
+              backgroundColor: Theme.of(context).colorScheme.secondary,
             ),
             child: const Text('Retirer de mes amis'),
           ),
@@ -268,7 +272,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ElevatedButton(
                 onPressed: () => _acceptFriendRequest(widget.uid),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                 ),
                 child: const Text('Accepter'),
               ),
@@ -276,7 +280,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ElevatedButton(
                 onPressed: () => _rejectFriendRequest(widget.uid),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
+                  backgroundColor: Theme.of(context).colorScheme.secondary,
                 ),
                 child: const Text('Refuser'),
               ),
@@ -291,7 +295,7 @@ class _ProfilePageState extends State<ProfilePage> {
       return ElevatedButton(
         onPressed: null, // Disable the button
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.grey,
+          backgroundColor: Theme.of(context).colorScheme.secondary,
         ),
         child: const Text('Envoyé'),
       );
@@ -300,7 +304,15 @@ class _ProfilePageState extends State<ProfilePage> {
     // If not friends and no pending requests
     return ElevatedButton(
       onPressed: _sendFriendRequest,
-      child: const Text('Ajouter comme ami'),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+      ),
+      child: Text(
+        'Ajouter comme ami',
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.inversePrimary,
+        ),
+      ),
     );
   }
 
@@ -311,131 +323,172 @@ class _ProfilePageState extends State<ProfilePage> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'Mes Amis',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.inverseSurface,
               ),
             ),
             TextButton(
               onPressed: () {
                 // full friends list page
               },
-              child: const Text('Voir tous'),
+              child: Text(
+                'Voir tous',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
             ),
           ],
         ),
         const SizedBox(height: 10),
         _friends.isEmpty
-            ? const Center(child: Text('Aucun ami'))
-            : SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: _friends.map((friend) {
-              return Padding(
-                padding: const EdgeInsets.only(right: 10),
-                child: Column(
-                  children: [
-                    CircleAvatar(
-                      radius: 30,
-                      backgroundColor: Colors.purple.shade100,
-                      child: Text(
-                        friend.name[0].toUpperCase(),
-                        style: const TextStyle(color: Colors.black),
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      friend.username,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+            ? Center(
+                child: Text(
+                  'Aucun ami',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 ),
-              );
-            }).toList(),
-          ),
-        ),
+              )
+            : SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: _friends.map((friend) {
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            radius: 30,
+                            backgroundColor:
+                                Theme.of(context).colorScheme.inverseSurface,
+                            child: Text(
+                              friend.name[0].toUpperCase(),
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .inversePrimary,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            friend.username,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
       ],
     );
   }
-
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isLoading ? "Profil" : userProfile?.name ?? "Profil"),
+        title: Text(
+          _isLoading ? "Profil" : userProfile?.name ?? "Profil",
+          style: TextStyle(color: Theme.of(context).colorScheme.primary),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         actions: [
           if (_isCurrentUser)
             IconButton(
-              icon: const Icon(Icons.settings),
+              icon: Icon(
+                Icons.settings,
+                color: Theme.of(context).colorScheme.primary,
+              ),
               onPressed: _showSettingsDialog,
             ),
         ],
       ),
+      backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : userProfile == null
-          ? const Center(child: Text('Utilisateur non trouvé'))
-          : SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Profile Picture
-              Center(
-                child: CircleAvatar(
-                  radius: 60,
-                  backgroundColor: Colors.purple.shade100,
-                  child: Text(
-                    userProfile!.name[0].toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 40,
-                      color: Colors.black,
+              ? const Center(child: Text('Utilisateur non trouvé'))
+              : SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Profile Picture
+                        Center(
+                          child: CircleAvatar(
+                            radius: 60,
+                            backgroundColor:
+                                Theme.of(context).colorScheme.inverseSurface,
+                            child: Text(
+                              userProfile!.name[0].toUpperCase(),
+                              style: TextStyle(
+                                fontSize: 40,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .inversePrimary,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Name and Username
+                        Text(
+                          userProfile!.name,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.inverseSurface,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          '@${userProfile!.username}',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontSize: 18,
+                          ),
+                        ),
+
+                        // Bio
+                        if (userProfile!.bio.isNotEmpty) ...[
+                          const SizedBox(height: 16),
+                          Text(
+                            userProfile!.bio,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color:
+                                  Theme.of(context).colorScheme.inverseSurface,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+
+                        const SizedBox(height: 16),
+
+                        // Friend Action Buttons
+                        _buildFriendInteractionButtons(),
+
+                        const SizedBox(height: 16),
+
+                        // Subscriptions Section
+                        if (_isCurrentUser) _buildFriendsSection(),
+
+                        const SizedBox(height: 16),
+                      ],
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-
-              // Name and Username
-              Text(
-                userProfile!.name,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              Text(
-                '@${userProfile!.username}',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-
-              // Bio
-              if (userProfile!.bio.isNotEmpty) ...[
-                const SizedBox(height: 16),
-                Text(
-                  userProfile!.bio,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ],
-
-              const SizedBox(height: 16),
-
-              // Friend Action Buttons
-              _buildFriendInteractionButtons(),
-
-              const SizedBox(height: 16),
-
-              // Subscriptions Section
-              if (_isCurrentUser) _buildFriendsSection(),
-
-              const SizedBox(height: 16),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

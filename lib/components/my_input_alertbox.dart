@@ -37,7 +37,7 @@ class MyInputAlertbox extends StatelessWidget {
       backgroundColor: Theme
           .of(context)
           .colorScheme
-          .surface,
+          .inversePrimary,
       content: TextField(
         controller: textController,
         maxLength: 200,
@@ -76,7 +76,7 @@ class MyInputAlertbox extends StatelessWidget {
           fillColor: Theme
               .of(context)
               .colorScheme
-              .secondary,
+              .inversePrimary,
           filled: true,
 
           // compteur de caractere

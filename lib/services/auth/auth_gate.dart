@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:messagerie_instantanee/pages/conversations_list_page.dart';
 import 'package:messagerie_instantanee/pages/user_list_page.dart';
 import '../../pages/home_page.dart';
 import 'login_or_register.dart';
@@ -24,7 +25,7 @@ class AuthGate extends StatelessWidget {
       body: StreamBuilder(stream: FirebaseAuth.instance.authStateChanges(), builder: (context, snapshot){
         // utilisateur connecté
         if(snapshot.hasData){
-          return const UsersListPage();
+          return const HomePage();
         } else {
           return LoginOrRegister();
         }

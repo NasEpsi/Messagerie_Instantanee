@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:messagerie_instantanee/pages/conversations_list_page.dart';
+import 'package:messagerie_instantanee/pages/friend_request_page.dart';
 import 'package:messagerie_instantanee/pages/home_page.dart';
 import 'package:messagerie_instantanee/pages/user_list_page.dart';
 
@@ -101,6 +102,21 @@ class MyDrawer extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => UsersListPage(),
+                    ),
+                  );
+                },
+              ),
+
+              // Rechercher
+              MyDrawerTile(
+                title: "Demande d'ami",
+                icon: Icons.mobile_friendly,
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => FriendRequestsPage(),
                     ),
                   );
                 },

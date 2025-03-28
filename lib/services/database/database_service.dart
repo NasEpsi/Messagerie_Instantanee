@@ -290,6 +290,15 @@ class DatabaseService {
       String? currentUserId = _auth.currentUser?.uid;
       if (currentUserId == null) return false;
 
+      // Get current user and sender profiles
+      UserProfile? currentUser = await getUserFromFirebase(currentUserId);
+      UserProfile? senderUser = await getUserFromFirebase(senderId);
+
+      if (currentUser == null || senderUser == null) {
+        print("User profiles not found");
+        return false;
+      }
+
       // Update current user's document
       await _db.collection("Users").doc(currentUserId).update({
         'friendRequests': FieldValue.arrayRemove([senderId]),
@@ -301,9 +310,45 @@ class DatabaseService {
         'friends': FieldValue.arrayUnion([currentUserId]),
       });
 
+      // Create a conversation between the two friends
+      List<String> participants = [currentUserId, senderId]..sort();
+      String conversationId = participants.join("_");
+
+      // Check if conversation already exists
+      DocumentSnapshot conversationDoc =
+      await _db.collection("Conversations").doc(conversationId).get();
+
+      if (!conversationDoc.exists) {
+        // Create a new conversation
+        Conversation newConversation = Conversation(
+          id: conversationId,
+          participants: participants,
+          lastMessage: 'You are now friends!',
+          lastMessageTimestamp: Timestamp.now(),
+          recipientName: senderUser.username,
+        );
+
+        await _db
+            .collection("Conversations")
+            .doc(conversationId)
+            .set(newConversation.toMap());
+
+        // Add a welcome message to the conversation
+        Message welcomeMessage = Message(
+          id: '',
+          uid: currentUserId,
+          username: currentUser.username,
+          content: 'You are now friends!',
+          timestamp: Timestamp.now(),
+          conversationId: conversationId,
+        );
+
+        await _db.collection("Messages").add(welcomeMessage.toMap());
+      }
+
       return true;
     } catch (e) {
-      print("Error accepting friend request: $e");
+      print(e);
       return false;
     }
   }

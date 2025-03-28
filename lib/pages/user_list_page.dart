@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:messagerie_instantanee/pages/profile_page.dart';
 import 'package:provider/provider.dart';
 import '../../services/database/database_service.dart';
 import '../../models/user.dart';
@@ -43,56 +44,91 @@ class _UsersListPageState extends State<UsersListPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Utilisateurs',
-          style: TextStyle(color: theme.onPrimary),
+        title: Text(
+          'Utilisateurs',
+          style: TextStyle(color: Theme.of(context).colorScheme.primary),
         ),
-        backgroundColor: theme.primary,
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
-      drawer: MyDrawer(),
+      backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : ListView.builder(
         itemCount: _users.length,
         itemBuilder: (context, index) {
           final user = _users[index];
-          return ListTile(
-            leading: CircleAvatar(
-              backgroundColor: theme.secondary,
-              child: Text(user.username[0].toUpperCase(),
-              style: TextStyle(color: theme.onSecondary),
-            ),
-            ),
-            title: Text(user.username,
-              style: TextStyle(color: theme.primary),
-            ),
-            subtitle: Text(user.email,
-              style: TextStyle(color: theme.tertiary),
-            ),
-            onTap: () {
-              // Generate conversation ID
-              List<String> participants = [
-                Provider.of<AuthService>(context, listen: false)
-                    .getCurrentUid(),
-                user.uid
-              ]..sort();
-              String conversationId = participants.join("_");
-
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ChatPage(
-                    conversationId: conversationId,
-                    recipientName: user.username,
-                  ),
-                ),
-              );
-            },
-          );
+          return UserTile(user: user);
         },
       ),
+    );
+  }
+}
+
+class UserTile extends StatelessWidget {
+  final UserProfile user;
+
+  const UserTile({
+    super.key,
+    required this.user,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ProfilePage(uid: user.uid),
+            ),
+          );
+        },
+        child: CircleAvatar(
+          backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+          child: Text(
+            user.username[0].toUpperCase(),
+            style: TextStyle(color: Theme.of(context).colorScheme.inversePrimary),
+          ),
+        ),
+      ),
+      title: Text(
+        user.username,
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          color: Theme.of(context).colorScheme.inverseSurface,
+          fontSize: 19,
+        ),
+      ),
+      subtitle: Text(
+        user.email,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.primary,
+          fontSize: 23,
+        ),
+      ),
+      onTap: () {
+        // Generate conversation ID
+        List<String> participants = [
+          Provider.of<AuthService>(context, listen: false).getCurrentUid(),
+          user.uid
+        ]..sort();
+        String conversationId = participants.join("_");
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatPage(
+              conversationId: conversationId,
+              recipientName: user.username,
+            ),
+          ),
+        );
+      },
     );
   }
 }
