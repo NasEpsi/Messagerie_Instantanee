@@ -15,10 +15,12 @@ import '../services/auth/auth_service.dart';
 * si le compte n'existe pas ,lien vers registerpage */
 
 class LoginPage extends StatefulWidget {
-
   final void Function()? onTap;
 
-  const LoginPage({super.key,required this.onTap,});
+  const LoginPage({
+    super.key,
+    required this.onTap,
+  });
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -51,7 +53,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 25.0),
         child: Center(
@@ -107,9 +109,8 @@ class _LoginPageState extends State<LoginPage> {
                 child: Text(
                   "Mot de passe oublié ?",
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.bold),
                 ),
               ),
 
@@ -137,9 +138,7 @@ class _LoginPageState extends State<LoginPage> {
                       color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
-
                   const SizedBox(width: 5),
-
                   GestureDetector(
                     onTap: widget.onTap,
                     child: Text(

@@ -32,6 +32,8 @@ class DatabaseProvider extends ChangeNotifier {
 
   // on recupere le profil utilisateur grace a luid
   Future<UserProfile?> userProfile(String uid) => _db.getUserFromFirebase(uid);
+  // Maj de la Bio
+  Future<void> updateBio(String bio) => _db.updateUserBioFirebase(bio);
 
 
   /*
@@ -50,8 +52,10 @@ class DatabaseProvider extends ChangeNotifier {
   // Get all the conversation of the user
   Future<void> loadAllUserConversations() async {
     String? uid = _auth.getCurrentUid();
-    if (uid == null) return;
-    _allConversations = await _db.getAllUserConversationsFromFirebase(uid);
+    final allConversations = await _db.getAllUserConversationsFromFirebase(uid);
+
+    // Local saving
+    _allConversations = allConversations;
     // Update UI
     notifyListeners();
   }
@@ -81,13 +85,20 @@ class DatabaseProvider extends ChangeNotifier {
   //   }
   // }
 
-  // Load messages conversation
-  Future<void> loadMessageinConversation(String conversationId) async {
-    _allMessages =
-    await _db.getAllMessageInConversationFromFirebase(conversationId);
-    notifyListeners();
-    await loadMessageinConversation(conversationId);
+  Map<String, Stream<List<Message>>> _conversationStreams = {};
+  Stream<List<Message>> getConversationMessagesStream(String conversationId) {
+    // If stream doesn't exist for this conversation, create it
+    if (!_conversationStreams.containsKey(conversationId)) {
+      _conversationStreams[conversationId] = _db.streamMessagesInConversation(conversationId);
+    }
+    return _conversationStreams[conversationId]!;
   }
+
+  Future<void> loadMessageinConversation(String conversationId) async {
+    _allMessages = await _db.getAllMessageInConversationFromFirebase(conversationId);
+    notifyListeners();
+  }
+
 
   String _generateConversationId(String uid1, String uid2) {
     List<String> participants = [uid1, uid2]..sort();
@@ -106,5 +117,39 @@ class DatabaseProvider extends ChangeNotifier {
     } catch (e) {
       print(e);
     }
+  }
+
+  // Friendss
+
+  Future<bool> sendFriendRequest(String receiverId) async {
+    bool result = await _db.sendFriendRequestInFirebase(receiverId);
+    notifyListeners();
+    return result;
+  }
+
+  Future<bool> acceptFriendRequest(String senderId) async {
+    bool result = await _db.acceptFriendRequestInFirebase(senderId);
+    notifyListeners();
+    return result;
+  }
+
+  Future<bool> rejectFriendRequest(String senderId) async {
+    bool result = await _db.rejectFriendRequestInFirebase(senderId);
+    notifyListeners();
+    return result;
+  }
+
+  Future<bool> removeFriend(String friendId) async {
+    bool result = await _db.removeFriendInFirebase(friendId);
+    notifyListeners();
+    return result;
+  }
+
+  Future<List<UserProfile>> getFriends() async {
+    return await _db.getFriendsInFirebase();
+  }
+
+  Future<List<UserProfile>> getPendingFriendRequests() async {
+    return await _db.getPendingFriendRequestsInFirebase();
   }
 }

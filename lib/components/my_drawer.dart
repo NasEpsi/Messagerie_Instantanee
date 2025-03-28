@@ -3,6 +3,7 @@ import 'package:messagerie_instantanee/pages/conversations_list_page.dart';
 import 'package:messagerie_instantanee/pages/home_page.dart';
 import 'package:messagerie_instantanee/pages/user_list_page.dart';
 
+import '../pages/profile_page.dart';
 import '../services/auth/auth_service.dart';
 import 'my_drawer_tile.dart';
 /*
@@ -35,7 +36,7 @@ class MyDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: Theme.of(context).colorScheme.inversePrimary,
 
       // icone
       child: SafeArea(
@@ -54,14 +55,14 @@ class MyDrawer extends StatelessWidget {
               Divider(
                   indent: 25,
                   endIndent: 25,
-                  color: Theme.of(context).colorScheme.inversePrimary),
+                  color: Theme.of(context).colorScheme.primary),
               const SizedBox(
                 height: 10,
               ),
 
               // Accueil
               MyDrawerTile(
-                title: "Accueil",
+                title: "Vos conversations",
                 icon: Icons.home,
                 onTap: () {
                   Navigator.pop(context);
@@ -75,21 +76,20 @@ class MyDrawer extends StatelessWidget {
               ),
 
               // Profil
-              // MyDrawerTile(
-              //   title: "Profil",
-              //   icon: Icons.person,
-              //   onTap: () {
-              //     Navigator.pop(context);
-              //
-              //     Navigator.push(
-              //       context,
-              //       MaterialPageRoute(
-              //         builder: (context) =>
-              //             ProfilePage(uid: _auth.getCurrentUid()),
-              //       ),
-              //     );
-              //   },
-              // ),
+              MyDrawerTile(
+                  title: "Profil",
+                  icon: Icons.person,
+                  onTap: () {
+                    Navigator.pop(context); // Close the drawer
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProfilePage(
+                          uid: _auth.getCurrentUid(),
+                        ),
+                      ),
+                    );
+                  }),
 
               // Rechercher
               MyDrawerTile(

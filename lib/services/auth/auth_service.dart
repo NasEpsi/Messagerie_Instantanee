@@ -24,15 +24,12 @@ class AuthService {
 
   // get the current user and his id
   User? getCurrentUser() => _auth.currentUser;
-  // String? getCurrentUserId() {
-  //   return _auth.currentUser?.uid;
-  // }
 
   String getCurrentUid() => _auth.currentUser!.uid;
 
   // login by email and password
   Future<UserCredential> loginEmailPassword(String email, password) async {
-    // tru to connect
+    // try to connect
     try {
       final userCredential = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
@@ -55,5 +52,4 @@ class AuthService {
     }
   }
 
-//Delete
 }

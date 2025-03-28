@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
 import '../pages/conversations_list_page.dart';
+import '../pages/profile_page.dart';
 import '../pages/user_list_page.dart';
 import '../services/auth/auth_service.dart';
 
+void goUserPage(BuildContext context, String uid) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => ProfilePage(uid: uid),
+    ),
+  );
+}
 class NavigationPages extends StatefulWidget {
   const NavigationPages({Key? key}) : super(key: key);
 

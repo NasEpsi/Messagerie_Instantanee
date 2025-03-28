@@ -32,7 +32,7 @@ class MyDrawerTile extends StatelessWidget {
     return ListTile(
       title: Text(
         title,
-        style: TextStyle(color: Theme.of(context).colorScheme.inversePrimary),
+        style: TextStyle(color: Theme.of(context).colorScheme.primary),
       ),
       leading: Icon(
         icon,

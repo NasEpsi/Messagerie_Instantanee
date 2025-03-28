@@ -17,6 +17,7 @@ class MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<DatabaseProvider>(context, listen: false);
+    final theme = Theme.of(context).colorScheme;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -28,7 +29,7 @@ class MessageBubble extends StatelessWidget {
           ),
           padding: const EdgeInsets.all(12.0),
           decoration: BoxDecoration(
-            color: isMyMessage ? Colors.blue[100] : Colors.grey[200],
+            color: isMyMessage ? Theme.of(context).colorScheme.secondary : Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(16.0),
           ),
           child: Column(
@@ -39,19 +40,21 @@ class MessageBubble extends StatelessWidget {
                   message.username,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: Colors.blue[800],
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
-              Text(message.content),
-              const SizedBox(height: 4),
+              Text(message.content,
+                style: TextStyle(
+                  color: isMyMessage ? Theme.of(context).colorScheme.inversePrimary : Theme.of(context).colorScheme.inversePrimary,
+                ),),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     formatTimestamp(message.timestamp),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 10,
-                      color: Colors.grey,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
                   const SizedBox(width: 4),
@@ -62,7 +65,7 @@ class MessageBubble extends StatelessWidget {
                     child: Icon(
                       message.isLiked ? Icons.favorite : Icons.favorite_border,
                       size: 16,
-                      color: message.isLiked ? Colors.red : Colors.grey,
+                      color: message.isLiked ? Theme.of(context).colorScheme.secondaryContainer : Theme.of(context).colorScheme.inversePrimary,
                     ),
                   ),
                   // Maybe later

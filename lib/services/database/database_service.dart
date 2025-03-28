@@ -19,6 +19,7 @@ import 'package:messagerie_instantanee/models/message.dart';
 
 import '../../models/conversation.dart';
 import '../../models/user.dart';
+import '../auth/auth_service.dart';
 
 class DatabaseService {
   // get an instance of firestore
@@ -45,6 +46,7 @@ class DatabaseService {
       name: name,
       email: email,
       username: username,
+      bio: '',
     );
 
     // converting the user in a map in order to save it in the firestore
@@ -53,6 +55,19 @@ class DatabaseService {
 
     // saving in the database
     await _db.collection('Users').doc(uid).set(userMap);
+  }
+
+  // Mettre a jour la bio
+  Future<void> updateUserBioFirebase(String bio) async {
+    // on recup id
+    String uid = AuthService().getCurrentUid();
+
+    // on le met met a jour dans firebase
+    try {
+      await _db.collection("Users").doc(uid).update({"bio": bio});
+    } catch (e) {
+      print(e);
+    }
   }
 
   // Recuperer les donnes utilisateur
@@ -95,6 +110,12 @@ class DatabaseService {
       if (currentUser == null || receiverUser == null) {
         print("User not found");
         return;
+      }
+
+      // Check if users are friends
+      if (!currentUser.friends.contains(receiverId) ||
+          !receiverUser.friends.contains(uid)) {
+        throw Exception("You can only message your friends");
       }
 
       //create an id for the conversation
@@ -144,7 +165,18 @@ class DatabaseService {
     }
   }
 
-// Update the getAllUserConversationsFromFirebase method to handle recipientName
+  Stream<List<Message>> streamMessagesInConversation(String conversationId) {
+    return _db
+        .collection("Messages")
+        .where('conversationId', isEqualTo: conversationId)
+        .orderBy('timestamp', descending: true)
+        .snapshots()
+        .map((snapshot) =>
+        snapshot.docs.map((doc) => Message.fromDocument(doc)).toList()
+    );
+  }
+
+// Get zll user you can chat with
   Future<List<Conversation>> getAllUserConversationsFromFirebase(String uid) async {
     try {
       QuerySnapshot snapshot = await _db
@@ -187,7 +219,7 @@ class DatabaseService {
       return [];
     }
   }
-  //Get all Message
+  //Get all Message of a conversation with someone
   Future<List<Message>> getAllMessageInConversationFromFirebase(
       String conversationId) async {
     try {
@@ -220,6 +252,143 @@ class DatabaseService {
       });
     } catch (e) {
       print(e);
+    }
+  }
+
+  // FRIENDSS
+
+// Send a friend request
+  Future<bool> sendFriendRequestInFirebase(String receiverId) async {
+    try {
+      String? currentUserId = _auth.currentUser?.uid;
+      if (currentUserId == null) return false;
+
+      DocumentSnapshot receiverDoc = await _db.collection("Users").doc(receiverId).get();
+      UserProfile receiverUser = UserProfile.fromDocument(receiverDoc);
+
+      // Check if already friends or request already sent
+      if (receiverUser.friends.contains(currentUserId) ||
+          receiverUser.friendRequests.contains(currentUserId)) {
+        return false;
+      }
+
+      // Add friend request to receiver's document
+      await _db.collection("Users").doc(receiverId).update({
+        'friendRequests': FieldValue.arrayUnion([currentUserId]),
+      });
+
+      return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+
+  // Accept a friend request
+  Future<bool> acceptFriendRequestInFirebase(String senderId) async {
+    try {
+      String? currentUserId = _auth.currentUser?.uid;
+      if (currentUserId == null) return false;
+
+      // Update current user's document
+      await _db.collection("Users").doc(currentUserId).update({
+        'friendRequests': FieldValue.arrayRemove([senderId]),
+        'friends': FieldValue.arrayUnion([senderId]),
+      });
+
+      // Update sender's document
+      await _db.collection("Users").doc(senderId).update({
+        'friends': FieldValue.arrayUnion([currentUserId]),
+      });
+
+      return true;
+    } catch (e) {
+      print("Error accepting friend request: $e");
+      return false;
+    }
+  }
+
+  // Reject a friend request
+  Future<bool> rejectFriendRequestInFirebase(String senderId) async {
+    try {
+      String? currentUserId = _auth.currentUser?.uid;
+      if (currentUserId == null) return false;
+
+      await _db.collection("Users").doc(currentUserId).update({
+        'friendRequests': FieldValue.arrayRemove([senderId]),
+      });
+
+      return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+
+  // Remove a friend
+  Future<bool> removeFriendInFirebase(String friendId) async {
+    try {
+      String? currentUserId = _auth.currentUser?.uid;
+      if (currentUserId == null) return false;
+
+      // Remove friend from current user's friend list
+      await _db.collection("Users").doc(currentUserId).update({
+        'friends': FieldValue.arrayRemove([friendId]),
+      });
+
+      // Remove current user from friend's friend list
+      await _db.collection("Users").doc(friendId).update({
+        'friends': FieldValue.arrayRemove([currentUserId]),
+      });
+
+      return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+
+  // Get friends of the current user
+  Future<List<UserProfile>> getFriendsInFirebase() async {
+    try {
+      String? currentUserId = _auth.currentUser?.uid;
+      if (currentUserId == null) return [];
+
+      DocumentSnapshot userDoc = await _db.collection("Users").doc(currentUserId).get();
+      UserProfile currentUser = UserProfile.fromDocument(userDoc);
+
+      // Fetch friend profiles
+      List<Future<UserProfile?>> friendFutures = currentUser.friends.map((friendId) async {
+        return await getUserFromFirebase(friendId);
+      }).toList();
+
+      List<UserProfile> friends = (await Future.wait(friendFutures)).whereType<UserProfile>().toList();
+      return friends;
+    } catch (e) {
+      print(e);
+      return [];
+    }
+  }
+
+  // Get pending friend requests
+  Future<List<UserProfile>> getPendingFriendRequestsInFirebase() async {
+    try {
+      String? currentUserId = _auth.currentUser?.uid;
+      if (currentUserId == null) return [];
+
+      DocumentSnapshot userDoc = await _db.collection("Users").doc(currentUserId).get();
+      UserProfile currentUser = UserProfile.fromDocument(userDoc);
+
+      // Fetch friend request sender profiles
+      List<Future<UserProfile?>> requestFutures = currentUser.friendRequests.map((senderId) async {
+        return await getUserFromFirebase(senderId);
+      }).toList();
+
+      List<UserProfile> friendRequests = (await Future.wait(requestFutures)).whereType<UserProfile>().toList();
+      return friendRequests;
+    } catch (e) {
+      print("Error fetching friend requests: $e");
+      return [];
     }
   }
 }

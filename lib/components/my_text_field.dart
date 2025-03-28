@@ -49,7 +49,7 @@
             borderRadius: BorderRadius.circular(12),
           ),
 
-          fillColor: Theme.of(context).colorScheme.secondary,
+          fillColor: Theme.of(context).colorScheme.inversePrimary,
           filled: true,
 
           hintText: hintText,

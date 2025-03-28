@@ -1,8 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../components/my_message_bubble.dart';
+import '../models/message.dart';
+import '../services/auth/auth_service.dart';
 import '../services/database/database_provider.dart';
-import '../services/auth/auth_service.dart';  // Import AuthService
 
 class ChatPage extends StatefulWidget {
   final String conversationId;
@@ -19,13 +22,16 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  final TextEditingController _messageController = TextEditingController();
-  final ScrollController _scrollController = ScrollController();
+  late final TextEditingController _messageController;
+  late final ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
-    // Load messages for this conversation
+    _messageController = TextEditingController();
+    _scrollController = ScrollController();
+
+    // Load initial messages for this specific conversation
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<DatabaseProvider>(context, listen: false)
           .loadMessageinConversation(widget.conversationId);
@@ -68,42 +74,58 @@ class _ChatPageState extends State<ChatPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.recipientName),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.info_outline),
-            onPressed: () {
-              // TODO: Show conversation info
-            },
-          ),
-        ],
+        title: Text(
+          widget.recipientName,
+          style: TextStyle(color: Theme.of(context).colorScheme.primary),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
+      backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       body: Column(
         children: [
+          Divider(
+              indent: 25,
+              endIndent: 25,
+              color: Theme.of(context).colorScheme.primary),
           // Messages List
           Expanded(
             child: Consumer<DatabaseProvider>(
               builder: (context, databaseProvider, child) {
-                final messages = databaseProvider.allMessages;
+                return StreamBuilder<List<Message>>(
+                  stream: databaseProvider
+                      .getConversationMessagesStream(widget.conversationId),
+                  builder: (context, snapshot) {
+                    // Handle different snapshot states
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
 
-                if (messages.isEmpty) {
-                  return const Center(
-                    child: Text('Aucun message pour le moment'),
-                  );
-                }
+                    if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return Center(
+                        child: Text(
+                          'Aucun message pour le moment',
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary),
+                        ),
+                      );
+                    }
 
-                return ListView.builder(
-                  controller: _scrollController,
-                  reverse: true, // Display latest messages at the bottom
-                  padding: const EdgeInsets.all(8.0),
-                  itemCount: messages.length,
-                  itemBuilder: (context, index) {
-                    final message = messages[index];
-                    final isMyMessage = message.uid == currentUserId;
+                    final messages = snapshot.data!;
 
-                    return MessageBubble(
-                      message: message,
-                      isMyMessage: isMyMessage,
+                    return ListView.builder(
+                      controller: _scrollController,
+                      reverse: true,
+                      padding: const EdgeInsets.all(8.0),
+                      itemCount: messages.length,
+                      itemBuilder: (context, index) {
+                        final message = messages[index];
+                        final isMyMessage = message.uid == currentUserId;
+
+                        return MessageBubble(
+                          message: message,
+                          isMyMessage: isMyMessage,
+                        );
+                      },
                     );
                   },
                 );
@@ -115,10 +137,10 @@ class _ChatPageState extends State<ChatPage> {
           Container(
             padding: const EdgeInsets.all(8.0),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.primary,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
+                  color: Theme.of(context).colorScheme.primary,
                   spreadRadius: 1,
                   blurRadius: 3,
                   offset: const Offset(0, -1),
@@ -127,27 +149,29 @@ class _ChatPageState extends State<ChatPage> {
             ),
             child: Row(
               children: [
-                // Message Input Field
                 Expanded(
                   child: TextField(
                     controller: _messageController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: 'Ecrivez un message',
+                      hintStyle: TextStyle(color: Theme.of(context).colorScheme.primary),
+                      filled: true,
+                      fillColor: Theme.of(context).colorScheme.inversePrimary,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                        borderSide: BorderSide(color: Theme.of(context).colorScheme.tertiary),
                       ),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                     ),
                     maxLines: null,
                     textCapitalization: TextCapitalization.sentences,
                   ),
                 ),
-
-                // Send Button
                 IconButton(
                   icon: const Icon(Icons.send),
                   onPressed: _sendMessage,
-                  color: Theme.of(context).primaryColor,
+                  color: Theme.of(context).colorScheme.inversePrimary,
                 ),
               ],
             ),
@@ -157,5 +181,3 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 }
-
-// Rest of the code remains the same as in the previous implementation

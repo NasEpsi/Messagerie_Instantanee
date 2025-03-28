@@ -24,7 +24,7 @@ class ConversationTile extends StatelessWidget {
     return ListTile(
       onTap: onTap,
       leading: CircleAvatar(
-        backgroundColor: Colors.blueGrey,
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         child: Text(
           conversation.recipientName.isNotEmpty
               ? conversation.recipientName[0].toUpperCase()

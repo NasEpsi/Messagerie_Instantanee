@@ -30,7 +30,8 @@ class MyButton extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(25),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.secondary,
+          color: Theme.of(context).colorScheme.primary,
+            borderRadius: BorderRadius.circular(12)
         ),
         child: Center(
           child: Text(
@@ -38,6 +39,8 @@ class MyButton extends StatelessWidget {
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 16,
+              color: Theme.of(context).colorScheme.inversePrimary,
+
             ),
 
           ),

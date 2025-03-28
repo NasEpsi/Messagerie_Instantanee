@@ -43,9 +43,13 @@ class _UsersListPageState extends State<UsersListPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Users'),
+        title: Text('Utilisateurs',
+          style: TextStyle(color: theme.onPrimary),
+        ),
+        backgroundColor: theme.primary,
       ),
       drawer: MyDrawer(),
       body: _isLoading
@@ -56,10 +60,17 @@ class _UsersListPageState extends State<UsersListPage> {
           final user = _users[index];
           return ListTile(
             leading: CircleAvatar(
-              child: Text(user.username[0].toUpperCase()),
+              backgroundColor: theme.secondary,
+              child: Text(user.username[0].toUpperCase(),
+              style: TextStyle(color: theme.onSecondary),
             ),
-            title: Text(user.username),
-            subtitle: Text(user.email),
+            ),
+            title: Text(user.username,
+              style: TextStyle(color: theme.primary),
+            ),
+            subtitle: Text(user.email,
+              style: TextStyle(color: theme.tertiary),
+            ),
             onTap: () {
               // Generate conversation ID
               List<String> participants = [
